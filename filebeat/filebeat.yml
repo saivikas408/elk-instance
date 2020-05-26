@@ -1,0 +1,21 @@
+filebeat.inputs:
+  - type: container
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+setup.kibana:
+  host: http://18.220.29.49:5601
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_kubernetes_metadata: ~
+  - add_docker_metadata:
+     host: "unix:///var/run/docker.sock"
+     match_fields: ["system.process.cgroup.id"]
+     match_pids: ["process.pid", "process.ppid"]
+     match_source: true
+     match_source_index: 4
+     match_short_id: false
+     cleanup_timeout: 60
+     labels.dedot: false
